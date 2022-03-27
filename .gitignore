@@ -42,3 +42,6 @@ public/sw*
 # Hardhat files
 cache
 artifacts
+
+# Sentry
+.sentryclirc

@@ -1,4 +1,6 @@
-module.exports = {
+const { withSentryConfig } = require('@sentry/nextjs')
+
+const moduleExports = {
   webpack: (config, { dev, isServer }) => {
     // Replace React with Preact only in client production build
     if (!dev && !isServer) {
@@ -16,3 +18,9 @@ module.exports = {
     GIT_COMMIT_SHA: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
   }
 }
+
+const sentryWebpackPluginOptions = {
+  silent: true // Suppresses all logs
+}
+
+module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions)
