@@ -13,7 +13,7 @@ const Mirrored: React.FC<Props> = ({ post }) => {
     <div className="flex items-center pb-4 space-x-1 text-sm text-gray-500">
       <DuplicateIcon className="w-4 h-4" />
       <div className="flex items-center space-x-1">
-        <div>Mirror of</div>
+        <div>Mirrored a</div>
         <Link href={`/posts/${post?.mirrorOf?.id}`}>
           <a className="font-bold">
             {/* @ts-ignore */}
