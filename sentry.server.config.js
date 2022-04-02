@@ -1,8 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
 
-const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
+import { IS_PRODUCTION, SENTRY_DSN } from './src/constants'
 
 Sentry.init({
   dsn: SENTRY_DSN,
+  enabled: IS_PRODUCTION,
   tracesSampleRate: 1.0
 })
