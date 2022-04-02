@@ -1,6 +1,7 @@
 import LensHubProxy from '@abis/LensHubProxy.json'
 import { gql, useMutation } from '@apollo/client'
 import Attachments from '@components/Shared/Attachments'
+import Giphy from '@components/Shared/Giphy'
 import IndexStatus from '@components/Shared/IndexStatus'
 import SelectReferenceModule from '@components/Shared/SelectReferenceModule'
 import SwitchNetwork from '@components/Shared/SwitchNetwork'
@@ -12,6 +13,7 @@ import { Spinner } from '@components/UI/Spinner'
 import { TextArea } from '@components/UI/TextArea'
 import AppContext from '@components/utils/AppContext'
 import { CreatePostBroadcastItemResult, EnabledModule } from '@generated/types'
+import { IGif } from '@giphy/js-types'
 import { PencilAltIcon } from '@heroicons/react/outline'
 import {
   defaultFeeData,
@@ -40,8 +42,8 @@ import {
 } from 'wagmi'
 import { object, string } from 'zod'
 
+import Attachment from '../../Shared/Attachment'
 import SelectCollectModule from '../../Shared/SelectCollectModule'
-import Attachment from './Attachment'
 
 export const CREATE_POST_TYPED_DATA_MUTATION = gql`
   mutation CreatePostTypedData($request: CreatePublicPostRequest!) {
@@ -217,6 +219,15 @@ const NewPost: React.FC<Props> = ({ refetch }) => {
     }
   }
 
+  const setGifAttachment = (gif: IGif) => {
+    const attachment = {
+      item: gif.images.original.url,
+      type: 'image/gif'
+    }
+    // @ts-ignore
+    setAttachments([...attachments, attachment])
+  }
+
   return (
     <Card>
       <div className="px-5 pt-5 pb-3">
@@ -240,6 +251,7 @@ const NewPost: React.FC<Props> = ({ refetch }) => {
           />
           <div className="flex items-center">
             <div className="flex items-center space-x-4">
+              <Giphy setGifAttachment={(gif: IGif) => setGifAttachment(gif)} />
               <Attachment
                 attachments={attachments}
                 setAttachments={setAttachments}

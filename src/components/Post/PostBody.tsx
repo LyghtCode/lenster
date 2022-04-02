@@ -30,7 +30,7 @@ const PostBody: React.FC<Props> = ({ post }) => {
   )
 
   return (
-    <div className="linkify">
+    <div className="break-words linkify">
       <Linkify tagName="div" options={linkifyOptions}>
         {postType === 'community' ? (
           <div className="flex items-center space-x-1.5">
@@ -44,7 +44,7 @@ const PostBody: React.FC<Props> = ({ post }) => {
             ) : (
               <span>Launched a new community</span>
             )}
-            <a className="font-bold" href={`/communities/${post.pubId}`}>
+            <a className="font-bold" href={`/communities/${post.id}`}>
               {post?.metadata?.name}
             </a>
           </div>

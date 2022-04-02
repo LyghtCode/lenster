@@ -26,10 +26,12 @@ export type Scalars = {
   CollectModuleData: any
   /** Contract address custom scalar type */
   ContractAddress: any
+  /** create handle custom scalar type */
+  CreateHandle: any
   /** Cursor custom scalar type */
   Cursor: any
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
-  DateTime: string
+  DateTime: any
   /** Ethereum address custom scalar type */
   EthereumAddress: any
   /** follow module data scalar type */
@@ -124,6 +126,10 @@ export type AuthenticationResult = {
   refreshToken: Scalars['Jwt']
 }
 
+export type BurnProfileRequest = {
+  profileId: Scalars['ProfileId']
+}
+
 /** The challenge request */
 export type ChallengeRequest = {
   /** The ethereum address you want to login with */
@@ -131,23 +137,14 @@ export type ChallengeRequest = {
 }
 
 export type ClaimHandleRequest = {
-  id: Scalars['HandleClaimIdScalar']
+  freeTextHandle?: InputMaybe<Scalars['CreateHandle']>
+  id?: InputMaybe<Scalars['HandleClaimIdScalar']>
 }
 
-export type ClaimableHandle = {
-  __typename?: 'ClaimableHandle'
-  expiry: Scalars['DateTime']
-  handle: Scalars['Handle']
-  id: Scalars['HandleClaimIdScalar']
-  source: Scalars['String']
-}
-
-export type ClaimedHandle = {
-  __typename?: 'ClaimedHandle'
-  claimedAt: Scalars['DateTime']
-  handle: Scalars['Handle']
-  id: Scalars['HandleClaimIdScalar']
-  source: Scalars['String']
+export type ClaimableHandles = {
+  __typename?: 'ClaimableHandles'
+  canClaimFreeTextHandle: Scalars['Boolean']
+  reservedHandles: Array<ReservedClaimableHandle>
 }
 
 export type CollectModule =
@@ -239,6 +236,17 @@ export type CreateBurnEip712TypedDataValue = {
   deadline: Scalars['UnixTimestamp']
   nonce: Scalars['Nonce']
   tokenId: Scalars['String']
+}
+
+/** The broadcast item */
+export type CreateBurnProfileBroadcastItemResult = {
+  __typename?: 'CreateBurnProfileBroadcastItemResult'
+  /** The date the broadcast item expiries */
+  expiresAt: Scalars['DateTime']
+  /** This broadcast item ID */
+  id: Scalars['BroadcastId']
+  /** The typed data */
+  typedData: CreateBurnEip712TypedData
 }
 
 /** The broadcast item */
@@ -458,7 +466,7 @@ export type CreateProfileRequest = {
   followModule?: InputMaybe<FollowModuleParams>
   /** The follow NFT URI is the NFT metadata your followers will mint when they follow you. This can be updated at all times. If you do not pass in anything it will create a super cool changing NFT which will show the last publication of your profile as the NFT which looks awesome! This means people do not have to worry about writing this logic but still have the ability to customise it for their followers */
   followNFTURI?: InputMaybe<Scalars['Url']>
-  handle: Scalars['Handle']
+  handle: Scalars['CreateHandle']
   /** The profile picture uri */
   profilePictureUri?: InputMaybe<Scalars['Url']>
 }
@@ -659,6 +667,10 @@ export type CreateUnfollowBroadcastItemResult = {
   typedData: CreateBurnEip712TypedData
 }
 
+export type DefaultProfileRequest = {
+  ethereumAddress: Scalars['EthereumAddress']
+}
+
 /** The dispatcher */
 export type Dispatcher = {
   __typename?: 'Dispatcher'
@@ -760,6 +772,8 @@ export type Erc20Amount = {
 
 export type ExplorePublicationRequest = {
   cursor?: InputMaybe<Scalars['Cursor']>
+  /** If you wish to exclude any results for profile ids */
+  excludeProfileIds?: InputMaybe<Array<Scalars['ProfileId']>>
   limit?: InputMaybe<Scalars['LimitScalar']>
   /** If you want the randomizer off (default on) */
   noRandomize?: InputMaybe<Scalars['Boolean']>
@@ -1185,12 +1199,14 @@ export type Mutation = {
   attachFile: AttachResults
   authenticate: AuthenticationResult
   claim: RelayResult
+  createBurnProfileTypedData: CreateBurnProfileBroadcastItemResult
   createCollectTypedData: CreateCollectBroadcastItemResult
   createCommentTypedData: CreateCommentBroadcastItemResult
   createFollowTypedData: CreateFollowBroadcastItemResult
   createMirrorTypedData: CreateMirrorBroadcastItemResult
   createPostTypedData: CreatePostBroadcastItemResult
   createProfile: RelayResult
+  createSetDefaultProfileTypedData: SetDefaultProfileBroadcastItemResult
   createSetDispatcherTypedData: CreateSetDispatcherBroadcastItemResult
   createSetFollowModuleTypedData: CreateSetFollowModuleBroadcastItemResult
   createSetFollowNFTUriTypedData: CreateSetFollowNftUriBroadcastItemResult
@@ -1212,6 +1228,11 @@ export type MutationAuthenticateArgs = {
 
 export type MutationClaimArgs = {
   request: ClaimHandleRequest
+}
+
+export type MutationCreateBurnProfileTypedDataArgs = {
+  options?: InputMaybe<TypedDataOptions>
+  request: BurnProfileRequest
 }
 
 export type MutationCreateCollectTypedDataArgs = {
@@ -1241,6 +1262,11 @@ export type MutationCreatePostTypedDataArgs = {
 
 export type MutationCreateProfileArgs = {
   request: CreateProfileRequest
+}
+
+export type MutationCreateSetDefaultProfileTypedDataArgs = {
+  options?: InputMaybe<TypedDataOptions>
+  request: SetDefaultProfileRequest
 }
 
 export type MutationCreateSetDispatcherTypedDataArgs = {
@@ -1551,6 +1577,8 @@ export type Profile = {
   handle: Scalars['Handle']
   /** The profile id */
   id: Scalars['ProfileId']
+  /** Is the profile default */
+  isDefault: Scalars['Boolean']
   /** Location set on profile */
   location?: Maybe<Scalars['String']>
   /** Name of the profile */
@@ -1743,8 +1771,8 @@ export type Query = {
   __typename?: 'Query'
   approvedModuleAllowanceAmount: Array<ApprovedAllowanceAmount>
   challenge: AuthChallengeResult
-  claimableHandles: Array<ClaimableHandle>
-  claimedHandles: Array<ClaimedHandle>
+  claimableHandles: ClaimableHandles
+  defaultProfile?: Maybe<Profile>
   doesFollow: Array<DoesFollowResponse>
   enabledModuleCurrencies: Array<Erc20>
   enabledModules: EnabledModules
@@ -1781,6 +1809,10 @@ export type QueryApprovedModuleAllowanceAmountArgs = {
 
 export type QueryChallengeArgs = {
   request: ChallengeRequest
+}
+
+export type QueryDefaultProfileArgs = {
+  request: DefaultProfileRequest
 }
 
 export type QueryDoesFollowArgs = {
@@ -1927,6 +1959,14 @@ export type ReportingReasonInputParams = {
   sensitiveReason?: InputMaybe<SensitiveReasonInputParams>
 }
 
+export type ReservedClaimableHandle = {
+  __typename?: 'ReservedClaimableHandle'
+  expiry: Scalars['DateTime']
+  handle: Scalars['Handle']
+  id: Scalars['HandleClaimIdScalar']
+  source: Scalars['String']
+}
+
 export type RevertCollectModuleSettings = {
   __typename?: 'RevertCollectModuleSettings'
   contractAddress: Scalars['ContractAddress']
@@ -1955,6 +1995,48 @@ export type SearchResult = ProfileSearchResult | PublicationSearchResult
 export type SensitiveReasonInputParams = {
   reason: PublicationReportingReason
   subreason: PublicationReportingSensitiveSubreason
+}
+
+/** The broadcast item */
+export type SetDefaultProfileBroadcastItemResult = {
+  __typename?: 'SetDefaultProfileBroadcastItemResult'
+  /** The date the broadcast item expiries */
+  expiresAt: Scalars['DateTime']
+  /** This broadcast item ID */
+  id: Scalars['BroadcastId']
+  /** The typed data */
+  typedData: SetDefaultProfileEip712TypedData
+}
+
+/** The default profile eip 712 typed data */
+export type SetDefaultProfileEip712TypedData = {
+  __typename?: 'SetDefaultProfileEIP712TypedData'
+  /** The typed data domain */
+  domain: Eip712TypedDataDomain
+  /** The types */
+  types: SetDefaultProfileEip712TypedDataTypes
+  /** The values */
+  value: SetDefaultProfileEip712TypedDataValue
+}
+
+/** The default profile eip 712 typed data types */
+export type SetDefaultProfileEip712TypedDataTypes = {
+  __typename?: 'SetDefaultProfileEIP712TypedDataTypes'
+  SetDefaultProfileWithSig: Array<Eip712TypedDataField>
+}
+
+/** The default profile eip 712 typed data value */
+export type SetDefaultProfileEip712TypedDataValue = {
+  __typename?: 'SetDefaultProfileEIP712TypedDataValue'
+  deadline: Scalars['UnixTimestamp']
+  nonce: Scalars['Nonce']
+  profileId: Scalars['ProfileId']
+  wallet: Scalars['EthereumAddress']
+}
+
+export type SetDefaultProfileRequest = {
+  /** Profile id */
+  profileId: Scalars['ProfileId']
 }
 
 export type SetDispatcherRequest = {

@@ -2,7 +2,9 @@ import Follow from '@components/Shared/Follow'
 import Unfollow from '@components/Shared/Unfollow'
 import { NewFollowerNotification } from '@generated/types'
 import { BadgeCheckIcon } from '@heroicons/react/outline'
+import { formatUsername } from '@lib/formatUsername'
 import { getAvatar } from '@lib/getAvatar'
+import { imagekitURL } from '@lib/imagekitURL'
 import { isVerified } from '@lib/isVerified'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -23,7 +25,7 @@ const FollowerNotification: React.FC<Props> = ({ notification }) => {
 
   return (
     <div className="p-5">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <Link
           href={
             wallet?.defaultProfile
@@ -37,9 +39,13 @@ const FollowerNotification: React.FC<Props> = ({ notification }) => {
                 src={
                   wallet?.defaultProfile?.picture
                     ? getAvatar(wallet?.defaultProfile)
-                    : `https://avatar.tobi.sh/${wallet?.address}.svg`
+                    : imagekitURL(
+                        `https://avatar.tobi.sh/${wallet?.address}.svg`,
+                        500,
+                        500
+                      )
                 }
-                className="w-10 h-10 bg-gray-200 rounded-full border dark:border-gray-700"
+                className="w-10 h-10 bg-gray-200 border rounded-full dark:border-gray-700"
                 alt={
                   wallet?.defaultProfile
                     ? wallet?.defaultProfile?.handle
@@ -47,14 +53,14 @@ const FollowerNotification: React.FC<Props> = ({ notification }) => {
                 }
               />
               <div>
-                <div className="flex gap-1 items-center">
+                <div className="flex items-center gap-1">
                   <div className="font-bold">
                     {wallet?.defaultProfile?.name ??
                       wallet?.defaultProfile?.handle ??
-                      wallet.address}
+                      formatUsername(wallet.address)}
                   </div>
                   {wallet?.defaultProfile &&
-                    isVerified(wallet?.defaultProfile?.handle) && (
+                    isVerified(wallet?.defaultProfile?.id) && (
                       <BadgeCheckIcon className="w-4 h-4 text-brand-500" />
                     )}
                   <div className="pl-0.5 text-gray-600">followed you</div>

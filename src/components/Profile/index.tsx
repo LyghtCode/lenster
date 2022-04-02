@@ -1,6 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
 import { GridItemEight, GridItemFour, GridLayout } from '@components/GridLayout'
-import { PageLoading } from '@components/UI/PageLoading'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -11,6 +10,7 @@ import Details from './Details'
 import Feed from './Feed'
 import FeedType from './FeedType'
 import NFTFeed from './NFTFeed'
+import ProfilePageShimmer from './Shimmer'
 
 export const PROFILE_QUERY = gql`
   query Profile($request: ProfileQueryRequest!) {
@@ -27,6 +27,9 @@ export const PROFILE_QUERY = gql`
         stats {
           totalFollowers
           totalFollowing
+          totalPosts
+          totalComments
+          totalMirrors
         }
         picture {
           ... on MediaSet {
@@ -57,7 +60,7 @@ const ViewProfile: NextPage = () => {
     skip: !username
   })
 
-  if (loading || !data) return <PageLoading message="Loading user" />
+  if (loading || !data) return <ProfilePageShimmer />
   if (data?.profiles?.items?.length === 0) return <Custom404 />
 
   const profile = data?.profiles?.items[0]
@@ -70,7 +73,11 @@ const ViewProfile: NextPage = () => {
           <Details profile={profile} />
         </GridItemFour>
         <GridItemEight className="space-y-5">
-          <FeedType setFeedType={setFeedType} feedType={feedType} />
+          <FeedType
+            stats={profile?.stats}
+            setFeedType={setFeedType}
+            feedType={feedType}
+          />
           {(feedType === 'POST' ||
             feedType === 'COMMENT' ||
             feedType === 'MIRROR') && (

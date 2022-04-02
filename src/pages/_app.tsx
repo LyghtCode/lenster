@@ -5,9 +5,9 @@ import SiteLayout from '@components/SiteLayout'
 import { providers } from 'ethers'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
+import Script from 'next/script'
 import { ThemeProvider } from 'next-themes'
-import NextNprogress from 'nextjs-progressbar'
-import { INFURA_ID } from 'src/constants'
+import { INFURA_ID, IS_PRODUCTION } from 'src/constants'
 import { chain, Connector, Provider } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
@@ -67,16 +67,18 @@ const App = ({ Component, pageProps }: AppProps) => {
             />
           </Head>
           <SiteLayout>
-            <NextNprogress
-              color="#8b5cf6"
-              height={2}
-              options={{ showSpinner: false }}
-              showOnShallow
-            />
             <Component {...pageProps} />
           </SiteLayout>
         </ThemeProvider>
       </ApolloProvider>
+      {IS_PRODUCTION && (
+        <Script
+          data-website-id="44ac57be-a743-4440-85bd-6592567935c9"
+          src="https://analytics.lenster.xyz/umami.js"
+          async
+          defer
+        />
+      )}
     </Provider>
   )
 }

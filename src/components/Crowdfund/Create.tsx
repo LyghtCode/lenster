@@ -26,6 +26,7 @@ import {
   CONNECT_WALLET,
   ERROR_MESSAGE,
   LENSHUB_PROXY,
+  WMATIC_TOKEN,
   WRONG_NETWORK
 } from 'src/constants'
 import Custom404 from 'src/pages/404'
@@ -71,9 +72,7 @@ const Create: React.FC = () => {
   const [coverType, setCoverType] = useState<string>()
   const [isUploading, setIsUploading] = useState<boolean>(false)
   const [uploading, setUploading] = useState<boolean>(false)
-  const [selectedCurrency, setSelectedCurrency] = useState<string>(
-    '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889'
-  )
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(WMATIC_TOKEN)
   const [selectedCurrencySymobol, setSelectedCurrencySymobol] =
     useState<string>('WMATIC')
   const { currentUser } = useContext(AppContext)
@@ -266,7 +265,7 @@ const Create: React.FC = () => {
                     Select Currency
                   </div>
                   <select
-                    className="w-full bg-white rounded-xl border border-gray-300 outline-none dark:bg-gray-800 dark:border-gray-700 disabled:bg-gray-500 disabled:bg-opacity-20 disabled:opacity-60 focus:border-brand-500 focus:ring-brand-400"
+                    className="w-full bg-white border border-gray-300 outline-none rounded-xl dark:bg-gray-800 dark:border-gray-700 disabled:bg-gray-500 disabled:bg-opacity-20 disabled:opacity-60 focus:border-brand-500 focus:ring-brand-400"
                     onChange={(e) => {
                       const currency = e.target.value.split('-')
                       setSelectedCurrency(currency[0])
@@ -328,7 +327,7 @@ const Create: React.FC = () => {
                     {cover && (
                       <div>
                         <img
-                          className="w-60 h-60 rounded-lg"
+                          className="object-cover w-full rounded-lg h-60"
                           src={cover}
                           alt={cover}
                         />
